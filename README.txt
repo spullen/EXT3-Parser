@@ -4,7 +4,8 @@ By:   Scott Pullen
 Date: 2008-12-15
 
 
-For digital forensics course_____________________________________________________________________________________________
+For digital forensics course
+_____________________________________________________________________________________________
 
 About:
 Parses an EXT3 image. The EXT3 filesystem is one of the more popular file systems used by
