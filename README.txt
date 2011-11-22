@@ -3,7 +3,8 @@ EXT3 Parser
 By:   Scott Pullen
 Date: 2008-12-15
 
-_____________________________________________________________________________________________
+
+For digital forensics course_____________________________________________________________________________________________
 
 About:
 Parses an EXT3 image. The EXT3 filesystem is one of the more popular file systems used by
