@@ -38,12 +38,13 @@ public class Ext3Parser {
 	public void parseGroupDescriptorTable() {
 		// read in the block of the group descriptor table
 		byte[] groupDescriptorTableBytes = new byte[this.superBlock.blockSize];
-		groupDescriptorTableBytes = FileReader.seekAndRead(groupDescriptorTableBytes, (this.superBlock.blockSize + this.offsetToImage), this.imageFile);
-		
+		final int offset = ((superBlock.blockGroupZeroStart + 1) * superBlock.blockSize) + offsetToImage;
+		groupDescriptorTableBytes = FileReader.seekAndRead(groupDescriptorTableBytes, offset, imageFile);
+
 		// figure out how many groups are in the filesystem
-		double groups = (this.superBlock.numOfBlocks * 1.0)/(this.superBlock.blocksPerGroup * 1.0);
+		double groups = (double) this.superBlock.numOfBlocks / (double) this.superBlock.blocksPerGroup;
 		this.numberOfBlockGroups = (int)Math.ceil(groups);
-		this.gdt = new GroupDescriptorTable(groupDescriptorTableBytes, this.numberOfBlockGroups);
+		this.gdt = new GroupDescriptorTable(superBlock, groupDescriptorTableBytes, this.numberOfBlockGroups);
 		this.gdt.printGroupDescriptorTable();
 	}
 	

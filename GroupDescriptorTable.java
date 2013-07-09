@@ -3,8 +3,9 @@ import java.util.List;
 
 public class GroupDescriptorTable {
 	
-	private byte[] grpDescTableBytes = null;
-	private int numberOfBlockGroups = 0;
+	private final byte[] grpDescTableBytes;
+	private final int numberOfBlockGroups;
+	private final SuperBlock superBlock;
 	
 	// entries of the group descriptor table
 	private List<GroupDescriptorEntry> entries = new LinkedList<GroupDescriptorEntry>();
@@ -13,7 +14,8 @@ public class GroupDescriptorTable {
 	 * Group Descriptor Table Constructor
 	 * @param grpDescTableBytes
 	 */
-	public GroupDescriptorTable(byte[] grpDescTableBytes, int numberOfBlockGroups) {
+	public GroupDescriptorTable(SuperBlock superBlock, byte[] grpDescTableBytes, int numberOfBlockGroups) {
+		this.superBlock = superBlock;
 		this.grpDescTableBytes = grpDescTableBytes;
 		this.numberOfBlockGroups = numberOfBlockGroups;
 		this.parseGroupDescriptorTable();
@@ -26,7 +28,12 @@ public class GroupDescriptorTable {
 	public void printGroupDescriptorTable() {
 		int cnt = 0;
 		for(GroupDescriptorEntry gde : this.entries) {
-			System.out.println("Block Group " + cnt + ":");
+			final int startBlock = cnt == 0 ? superBlock.blockGroupZeroStart : cnt * superBlock.blocksPerGroup + 1;
+			int endBlock = (cnt + 1) * superBlock.blocksPerGroup;
+			if (endBlock >= superBlock.numOfBlocks)
+				endBlock = superBlock.numOfBlocks - 1;
+			
+			System.out.println("Block Group " + cnt + ": (" + startBlock + "-" + endBlock + ")");
 			gde.printEntry();
 			cnt++;
 		}

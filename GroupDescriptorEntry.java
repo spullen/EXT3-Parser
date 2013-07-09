@@ -11,6 +11,7 @@ public class GroupDescriptorEntry {
 	short numUnallocatedBlocksInGroup;
 	short numUnallocatedInodesInGroup;
 	short numDirectoriesInGroup;
+	short pad;
 	
 	public GroupDescriptorEntry(byte[] entryBytes) {
 		this.parseEntry(entryBytes);
@@ -21,12 +22,13 @@ public class GroupDescriptorEntry {
 	 *
 	 */
 	public void printEntry() {
-		System.out.println("Block Address of Block Bitmap\t\t" + this.startingBlockAddressBlockBitmap);
-		System.out.println("Block Address of Inode Bitmap\t\t" + this.startingBlockAddressInodeBitmap);
-		System.out.println("Block Address of Inode Table\t\t" + this.startingBlockAddressInodeTable);
-		System.out.println("Unallocated Blocks in Group\t\t" + this.numUnallocatedBlocksInGroup);
-		System.out.println("Unallocated Inodes in Group\t\t" + this.numUnallocatedInodesInGroup);
-		System.out.println("Number of Directories in Group\t\t" + this.numDirectoriesInGroup);
+		System.out.println("\tBlock Address of Block Bitmap\t" + this.startingBlockAddressBlockBitmap);
+		System.out.println("\tBlock Address of Inode Bitmap\t" + this.startingBlockAddressInodeBitmap);
+		System.out.println("\tBlock Address of Inode Table\t" + this.startingBlockAddressInodeTable);
+		System.out.println("\tUnallocated Blocks in Group\t" + this.numUnallocatedBlocksInGroup);
+		System.out.println("\tUnallocated Inodes in Group\t" + this.numUnallocatedInodesInGroup);
+		System.out.println("\tNumber of Directories in Group\t" + this.numDirectoriesInGroup);
+		System.out.println("\tPad\t\t\t\t" + this.pad);
 		System.out.println();
 	}
 	
@@ -55,5 +57,10 @@ public class GroupDescriptorEntry {
 		
 		// number of directories in group (bytes 16 - 17)
 		this.numDirectoriesInGroup = buf.getShort(16);
+		
+		// pad (bytes 18 - 19)
+		this.pad = buf.getShort(18);
+		
+		// reserved (bytes 20 - 31)
 	}
 }
