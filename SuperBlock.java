@@ -1,5 +1,6 @@
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Arrays;
 
 public class SuperBlock {
 	
@@ -48,6 +49,10 @@ public class SuperBlock {
 	public int journalInode;
 	public int journalDevice;
 	public int headOfOrphanInodeList;
+	public int[] hashSeeds;
+	public int defHashVersion;
+	public int defaultMountOptions;
+	public int firstMetaBG;
 	
 	// compatible features
 	public boolean dirsIndex   = false;
@@ -127,6 +132,10 @@ public class SuperBlock {
 		System.out.println("Journal inode\t\t\t\t" + this.journalInode);
 		System.out.println("Journal device\t\t\t\t" + this.journalDevice);
 		System.out.println("Head of orphan inode list\t\t" + this.headOfOrphanInodeList);
+		System.out.println("Hash Seeds\t\t\t\t" + Arrays.toString(this.hashSeeds));
+		System.out.println("Def Hash Version\t\t\t" + this.defHashVersion);
+		System.out.println("Default Mount Options\t\t\t" + this.defaultMountOptions);
+		System.out.println("First Meta BG\t\t\t\t" + this.firstMetaBG);
 		Utility.printDivider();
 		System.out.println();
 	}
@@ -275,6 +284,25 @@ public class SuperBlock {
 		
 		// head of orphan inode list (bytes 232 - 235)
 		this.headOfOrphanInodeList = sbBuf.getInt(232);
+		
+		// hash seeds (bytes 236 - 251)
+		this.hashSeeds = new int[4];
+		for (int i = 0; i < 4; i++) {
+			this.hashSeeds[i] = sbBuf.getInt();
+		}
+		
+		// def hash version (byte 252)
+		this.defHashVersion = (int) sbBuf.get(252);
+		
+		// skip bytes 253-257 (padding)
+		
+		// default mount options (bytes 256 - 259)
+		this.defaultMountOptions = sbBuf.getInt(256);
+		
+		// first meta bg (bytes 260 - 263)
+		this.firstMetaBG = sbBuf.getInt(260);
+		
+		// remaining 760 bytes of superblock is padding
 	}
 	
 	/**
