@@ -28,7 +28,8 @@ public class GroupDescriptorTable {
 	public void printGroupDescriptorTable() {
 		int cnt = 0;
 		for(GroupDescriptorEntry gde : this.entries) {
-			final int startBlock = cnt == 0 ? superBlock.blockGroupZeroStart : cnt * superBlock.blocksPerGroup + 1;
+			final int startBlock = cnt == 0 ? superBlock.blockGroupZeroStart : cnt * superBlock.blocksPerGroup
+					+ superBlock.blockGroupZeroStart;
 			int endBlock = (cnt + 1) * superBlock.blocksPerGroup;
 			if (endBlock >= superBlock.numOfBlocks)
 				endBlock = superBlock.numOfBlocks - 1;

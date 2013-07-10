@@ -4,6 +4,26 @@ import java.util.Arrays;
 
 public class SuperBlock {
 	
+	public static final int EXT2_FEATURE_COMPAT_DIR_PREALLOC = 0x0001;
+	public static final int EXT2_FEATURE_COMPAT_IMAGIC_INODES = 0x0002;
+	public static final int EXT2_FEATURE_COMPAT_HAS_JOURNAL = 0x0004;
+	public static final int EXT2_FEATURE_COMPAT_EXT_ATTR = 0x0008;
+	public static final int EXT2_FEATURE_COMPAT_RESIZE_INO = 0x0010;
+	public static final int EXT2_FEATURE_COMPAT_DIR_INDEX = 0x0020;
+	public static final int EXT2_FEATURE_COMPAT_ANY = 0xFFFFFFFF;
+	
+	public static final int EXT2_FEATURE_RO_COMPAT_SPARSE_SUPER = 0x0001;
+	public static final int EXT2_FEATURE_RO_COMPAT_LARGE_FILE = 0x0002;
+	public static final int EXT2_FEATURE_RO_COMPAT_BTREE_DIR = 0x0004;
+	public static final int EXT2_FEATURE_RO_COMPAT_ANY = 0xFFFFFFFF;
+	
+	public static final int EXT2_FEATURE_INCOMPAT_COMPRESSION = 0x0001;
+	public static final int EXT2_FEATURE_INCOMPAT_FILETYPE = 0x0002;
+	public static final int EXT2_FEATURE_INCOMPAT_RECOVER = 0x0004;
+	public static final int EXT2_FEATURE_INCOMPAT_JOURNAL_DEV = 0x0008;
+	public static final int EXT2_FEATURE_INCOMPAT_METAG_BG = 0x0010;
+	public static final int EXT2_FEATURE_INCOMPAT_ANY = 0xFFFFFFFF;
+	
 	// the bytes of the super block (Raw Data)
 	private byte[] superBlockBytes;
 	
@@ -383,34 +403,28 @@ public class SuperBlock {
 	 */
 	public String getCompatibleFeatures(int value) {
 		String features = "";
-		if((value / 32) > 0 && value >= 32) {
+		if(Utility.hasBitFlag(value, EXT2_FEATURE_COMPAT_DIR_INDEX)) {
 			features += "Dir index_ ";
-			value -= 32;
 			this.dirsIndex = true;
 		}
-		if((value / 16) > 0 && value >= 16) {
+		if(Utility.hasBitFlag(value, EXT2_FEATURE_COMPAT_RESIZE_INO)) {
 			features += "Can resize_ ";
-			value -= 16;
 			this.canResize = true;
 		}
-		if((value / 8) > 0 && value >= 8) {
+		if(Utility.hasBitFlag(value, EXT2_FEATURE_COMPAT_EXT_ATTR)) {
 			features += "Ext Attr_ ";
-			value -= 8;
 			this.extAttr = true;
 		}
-		if((value / 4) > 0 && value >= 4) {
+		if(Utility.hasBitFlag(value, EXT2_FEATURE_COMPAT_HAS_JOURNAL)) {
 			features += "Journal_ ";
-			value -= 4;
 			this.hasJournal = true;
 		}
-		if((value / 2) > 0 && value >= 2) {
+		if(Utility.hasBitFlag(value, EXT2_FEATURE_COMPAT_IMAGIC_INODES)) {
 			features += "AFS inode exists_ ";
-			value -= 2;
 			this.afsInodes = true;
 		}
-		if((value / 1) > 0 && value >= 1) {
+		if(Utility.hasBitFlag(value, EXT2_FEATURE_COMPAT_DIR_PREALLOC)) {
 			features += "Preallocated Dirs_ ";
-			value -= 1;
 			this.preAllocDir = true;
 		}
 		features = features.replace('_', ',');
@@ -427,22 +441,19 @@ public class SuperBlock {
 	 */
 	public String getIncompatibleFeatures(int value) {
 		String features = "";
-		if((value / 8) > 0 && value >= 8) {
+		if(Utility.hasBitFlag(value, EXT2_FEATURE_INCOMPAT_JOURNAL_DEV)) {
 			features += "Journal Dev_ ";
-			value -= 8;
 			this.usesJournalDev = false;
 		}
-		if((value / 4) > 0 && value >= 4) {
+		if(Utility.hasBitFlag(value, EXT2_FEATURE_INCOMPAT_RECOVER)) {
 			features += "Needs Recovery_ ";
-			value -= 4;
 			this.needRecovery = false;
 		}
-		if((value / 2) > 0 && value >= 2) {
+		if(Utility.hasBitFlag(value, EXT2_FEATURE_INCOMPAT_FILETYPE)) {
 			features += "Contain File Type_ ";
-			value -= 2;
 			this.fileTypeField = false;
 		}
-		if((value / 1) > 0 && value >= 1) {
+		if(Utility.hasBitFlag(value, EXT2_FEATURE_INCOMPAT_COMPRESSION)) {
 			features += "Compression_";
 		}
 		features = features.replace('_', ',');
@@ -459,19 +470,16 @@ public class SuperBlock {
 	 */
 	public String getReadOnlyFeatures(int value) {
 		String features = "";
-		if((value / 4) > 0 && value >= 4) {
+		if(Utility.hasBitFlag(value, EXT2_FEATURE_RO_COMPAT_BTREE_DIR)) {
 			features += "Uses B-Tree_ ";
-			value -= 4;
 			this.usesBTree = true;
 		}
-		if((value / 2) > 0 && value >= 2) {
+		if(Utility.hasBitFlag(value, EXT2_FEATURE_RO_COMPAT_LARGE_FILE)) {
 			features += "Contains Large Files_ ";
-			value -= 2;
 			this.containsLgFiles = true;
 		}
-		if((value / 1) > 0 && value >= 1) {
+		if(Utility.hasBitFlag(value, EXT2_FEATURE_RO_COMPAT_SPARSE_SUPER)) {
 			features += "Sparse tables_ ";
-			value -= 1;
 			this.sparseSuper = true;
 		}
 		features = features.replace('_', ',');
