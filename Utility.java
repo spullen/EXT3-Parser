@@ -79,4 +79,27 @@ public class Utility {
 	public static void printDivider() {
 		System.out.println("------------------------------------------------------------------");
 	}
+	
+	/**
+	 * Read an unsigned short value from a {@link ByteBuffer} and return it as an integer.
+	 * 
+	 * @param buffer
+	 * @param offset
+	 * @return
+	 */
+	public static int getUnsignedShort(ByteBuffer buffer, int offset) {
+		final int val = buffer.getShort(offset);
+		return val >= 0 ? val : 0x10000 + val;
+	}
+	
+	/**
+	 * Determine if a value contains the specified bit flag.
+	 * 
+	 * @param value
+	 * @param flag
+	 * @return
+	 */
+	public static boolean hasBitFlag(int value, int flag) {
+		return (value & flag) == flag;
+	}
 }

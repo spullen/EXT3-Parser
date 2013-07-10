@@ -23,15 +23,8 @@ public class DirectoryEntry {
 	 *
 	 */
 	public void printDirectories() {
-		for(String dir : this.directories) {
-			System.out.print("\t" + dir);
-			if(!this.fileType) {
-				System.out.println("(" + this.dirFileTypes.get(dir) + ")");
-			}
-			else {
-				System.out.println();
-			}
-		}
+		for (String dir : this.directories)
+			System.out.println("\t" + dir + "(" + this.dirFileTypes.get(dir) + ")");
 	}
 	
 	/**
@@ -53,76 +46,49 @@ public class DirectoryEntry {
 		
 		// figure out which entry version to use based on the fileType
 		int offset = 0;
-		if(fileType) {
-			/*
-			 * Layout:
-			 * 			bytes 0 - 3: Inode Value
-			 * 			bytes 4 - 5: Length of this entry
-			 * 			bytes 6 - 7: Name length
-			 * 			bytes 8+   : Name
-			 */
-			int nextInodeValue = buf.getInt(0);
-			while(nextInodeValue != 0) {
-				// get the entry length
-				int entryLength = buf.getShort(offset + 4);
-				
-				// get the name length
-				int nameLength = buf.getShort(offset + 6);
-				
-				// create a new byte array to store the name bytes
-				byte[] name = new byte[nameLength];
-				for(int i = 0; i < name.length; i++) {
-					name[i] = buf.get(i + offset + 8);
-				}
-				this.directories.add(new String(name));
-				
-				// update the offset
-				offset += entryLength;
-				
-				// get the next Inode Value
-				nextInodeValue = buf.getInt(offset);
+		
+		// Inode value (bytes 0-3)
+		int nextInodeValue = buf.getInt(0);
+		
+		// Read the next identified inode value
+		while (nextInodeValue != 0 && offset < this.entryBytes.length) {
+
+			// get the ushort entry length (bytes 4 - 5)
+			int entryLength = Utility.getUnsignedShort(buf, offset + 4);
+
+			// Originally fileType did not exist and was not added until 0.5 as such, the file type flag indicates if
+			// the file type will be available. If not available, the file inode must be read to get the type.
+			int nameLength;
+			int inodeFileType = 0;
+
+			if (fileType) {
+				// get the short name length (bytes 6 - 7)
+				nameLength = buf.getShort(offset + 6);
+			} else {
+				// get the ubyte name length (byte 6)
+				nameLength = buf.get(offset + 6) & 0xff;
+
+				// get the ubyte file type ( byte 7)
+				inodeFileType = buf.get(offset + 7) & 0xff;
 			}
-			
-		}
-		else {
-			/*
-			 * Layout:
-			 * 			bytes 0 - 3: Inode Value
-			 * 			bytes 4 - 5: Length of ths entry
-			 * 			bytes 6 - 6: Name Length
-			 * 			bytes 7 - 7: File Type
-			 * 			bytes 8+   : Name
-			 */
-			int nextInodeValue = buf.getInt(0);
-			while(nextInodeValue != 0 && offset < this.entryBytes.length) {
-				// get the entry length
-				int entryLength = buf.getShort(offset + 4);
-				
-				// get the name length
-				int nameLength = buf.get(offset + 6);
-				
-				// get the file type
-				int fileType = buf.get(offset + 7);
-				
-				// create a new byte array to store the name bytes
-				byte[] name = new byte[nameLength];
-				for(int i = 0; i < name.length; i++) {
-					name[i] = buf.get(i + offset + 8);
-				}
-				String nameStr = new String(name);
-				this.directories.add(nameStr);
-				
-				// figure out the directory file type and store in HashMap with key = the name
-				String ft = this.getTypeField(fileType);
-				this.dirFileTypes.put(nameStr, ft);
-				
-				// update the offset
-				offset += entryLength;
-				
-				// get the next Inode Value
-				if(offset < this.entryBytes.length) {
-					nextInodeValue = buf.getInt(offset);
-				}
+
+			// create a new byte array to store the name bytes
+			byte[] name = new byte[nameLength];
+			buf.position(offset + 8);
+			buf.get(name);
+
+			final String nameStr = new String(name);
+			this.directories.add(nameStr);
+
+			// figure out the directory file type and store in HashMap with key = the name
+			this.dirFileTypes.put(nameStr, getTypeField(inodeFileType));
+
+			// update the offset
+			offset += entryLength;
+
+			// get the next Inode Value
+			if (offset < this.entryBytes.length) {
+				nextInodeValue = buf.getInt(offset);
 			}
 		}
 	}
